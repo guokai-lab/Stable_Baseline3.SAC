@@ -22,5 +22,7 @@ SAC(
   sde_sample_freq = -1,  # 当 use_sde=True 时，多久重新采样一次 SDE 噪声；
                            默认 -1 意味着每个回合开始时采样一次；可以设置为其他正整数，例如 8，表示每 8 步重新采样一次；
   target_update_interval = 1,  # 每隔多少次梯度更新，更新一次目标网络；一般是1；
-  policy_kwargs = []
+  policy_kwargs = dict(net_arch=dict(pi=[64, 64], qf=[64, 64]),  # 分别定义策略网络（pi）和Q函数网络（qf）的网络结构；
+                   activation_fn=nn.ReLU/nn.Tanh,  # 激活函数；
+      ])
 )
