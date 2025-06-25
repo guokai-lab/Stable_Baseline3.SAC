@@ -1,0 +1,26 @@
+SAC(
+  policy = 'MlpPolicy' / 'CnnPolicy',  # 定义策略函数、价值函数的网络类型；
+                                         多层感知机（MlpPolicy）用于连续动作空间，卷积神经网络（CnnPolicy）用于像素输入如游戏；
+  learning_rate = 3e-4,   # 优化器（Adam）的学习率；太高可能导致不稳定，太低可能导致收敛缓慢；
+  buffer_size = 1e6,   # 经验缓存区；用于Off-Policy中存储和环境交互的经验；
+  learning_starts = 100, # buffer_size中存储learning_starts个经验后开始学习；
+  batch_size = 256, # 每次梯度更新从buffer_size中采样的经验数；
+  tau = 0.005,  # 目标网络（Target Network）软更新的系数；目标网络用于计算 Q 值目标，以提高训练稳定性；较小的值（如 0.001）使目标网络更新更慢，更稳定；
+                   target_weights = tau * current_weights + (1 - tau) * target_weights
+  gamma = 0.99,  # 折扣因子；用于平衡即时奖励和未来奖励的重要性；>>1：重视未来奖励；>>0：重视即时奖励；
+  train_freq = (1, "step),  # 多久进行一次迭代（梯度更新）；
+                                (1, "step"): 每收集一步环境经验，就进行一次梯度更新；
+                                (N, "step"): 每收集 N 步环境经验，就进行 N 次梯度更新（这是默认的 gradient_steps 行为）；
+                                (N, "episode"): 每完成 N 个回合，就进行一次训练；
+  gradient_steps = -1,  # 每次迭代时的梯度更新步数；
+                           如果 train_freq 是 (N, "step")，并且 gradient_steps 为 -1，则 gradient_steps 会自动设置为 N；
+                           如果 train_freq 是 (N, "episode")，并且 gradient_steps 为 -1，则它会进行 buffer_size / batch_size 次更新；
+                           可以显式设置一个正整数，强制每次训练迭代进行固定次数的梯度更新；
+  ent_coef = 'auto',  # 熵正则化系数，控制策略探索的随机性；一般为'auto'也可以自己设置；
+  use_sde = False,  # 是否使用随机微分方程 (SDE) 进行探索。这是一种替代高斯噪声的探索方式，有时在某些连续控制任务中表现更好；
+                      大多数情况下保持 False，如果遇到探索不足的问题，可以尝试设置为 True；
+  sde_sample_freq = -1,  # 当 use_sde=True 时，多久重新采样一次 SDE 噪声；
+                           默认 -1 意味着每个回合开始时采样一次；可以设置为其他正整数，例如 8，表示每 8 步重新采样一次；
+  target_update_interval = 1,  # 每隔多少次梯度更新，更新一次目标网络；一般是1；
+  policy_kwargs = []
+)
